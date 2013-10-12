@@ -71,7 +71,7 @@ defmodule Amrita.Formatter.Progress do
     else
       IO.write success(".")
     end
-    { :noreply, config.update_tests_counter(&1 + 1) }
+    { :noreply, &config.update_tests_counter(&1 + 1) }
   end
 
   def handle_cast({ :test_finished, ExUnit.Test[failure: { :invalid, _ }] = test }, config) do
@@ -80,7 +80,7 @@ defmodule Amrita.Formatter.Progress do
     else
       IO.write invalid("?")
     end
-    { :noreply, config.update_tests_counter(&1 + 1).
+    { :noreply, &config.update_tests_counter(&1 + 1).
         update_invalid_counter(&1 + 1) }
   end
 
@@ -94,7 +94,7 @@ defmodule Amrita.Formatter.Progress do
       else
         IO.write invalid("P")
       end
-      { :noreply, config.update_pending_counter(&1 + 1).
+      { :noreply, &config.update_pending_counter(&1 + 1).
         update_pending_failures([test|&1]) }
     else
       if config.trace do
@@ -102,7 +102,7 @@ defmodule Amrita.Formatter.Progress do
       else
         IO.write failure("F")
       end
-    { :noreply, config.update_tests_counter(&1 + 1).
+    { :noreply, &config.update_tests_counter(&1 + 1).
         update_test_failures([test|&1]) }
     end
   end
@@ -114,7 +114,7 @@ defmodule Amrita.Formatter.Progress do
 
   def handle_cast({ :case_finished, test_case }, config) do
     if test_case.failure do
-      { :noreply, config.update_case_failures([test_case|&1]) }
+      { :noreply, &config.update_case_failures([test_case|&1]) }
     else
       { :noreply, config }
     end
@@ -133,7 +133,7 @@ defmodule Amrita.Formatter.Progress do
 
   defp print_suite(counter, 0, num_pending, [], [], pending_failures, run_us, load_us) do
     IO.write "\n\nPending:\n\n"
-    Enum.reduce Enum.reverse(pending_failures), 0, print_test_pending(&1, &2)
+    Enum.reduce Enum.reverse(pending_failures), 0, &print_test_pending(&1, &2)
 
     IO.puts format_time(run_us, load_us)
     IO.write success("#{counter} facts, ")
@@ -149,12 +149,12 @@ defmodule Amrita.Formatter.Progress do
 
     if num_pending > 0 do
       IO.write "Pending:\n\n"
-      Enum.reduce Enum.reverse(pending_failures), 0, print_test_pending(&1, &2)
+      Enum.reduce Enum.reverse(pending_failures), 0, &print_test_pending(&1, &2)
     end
 
     IO.write "Failures:\n\n"
-    num_fails = Enum.reduce Enum.reverse(test_failures), 0, print_test_failure(&1, &2)
-    Enum.reduce Enum.reverse(case_failures), num_fails, print_test_case_failure(&1, &2)
+    num_fails = Enum.reduce Enum.reverse(test_failures), 0, &print_test_failure(&1, &2)
+    Enum.reduce Enum.reverse(case_failures), num_fails, &print_test_case_failure(&1, &2)
 
     IO.puts format_time(run_us, load_us)
     message = "#{counter} facts"

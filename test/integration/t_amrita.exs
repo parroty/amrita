@@ -201,7 +201,7 @@ defmodule Integration.AmritaFacts do
       [1, 2, 3] |> has_suffix HashSet.new([3,2])
     end
 
-    fact "for_all" do
+    future_fact "for_all" do
       [2, 4, 6, 8] |> for_all even(&1)
 
       [2, 4, 6, 8] |> Enum.all? even(&1)
@@ -211,7 +211,7 @@ defmodule Integration.AmritaFacts do
       end
     end
 
-    fact "for_some" do
+    future_fact "for_some" do
       [2, 4, 7, 8] |> for_some odd(&1)
 
       fail do
